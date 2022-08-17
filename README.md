@@ -4,6 +4,6 @@
 
 ## Schedule  
 
-| Attempt | #1  | #2  |
+| Week nr. | Date  | Topic  |
 | :-----: | :-: | :-: |
-| Seconds | 301 | 283 |
+| 1 | 09/13/2022 | Intro to R, types of data, tidyverse |
