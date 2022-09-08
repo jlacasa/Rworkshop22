@@ -9,7 +9,7 @@ format:
 
 ## Welcome!
 
-[Purpose of this workshop]{.ul}
+[**Purpose of this workshop**]{.ul}
 
 R as a calculator
 
@@ -38,7 +38,7 @@ An R package is a collection of functions, data, and documentation that extends 
 ### Functions
 
 ```{r}
-
+# read data
 ```
 
 ### tidyverse
@@ -69,7 +69,7 @@ The packages in the tidyverse share a common philosophy of data and R programmin
 
 -   \`rename()\`: renames columns
 
-### Good coding habits
+## Good coding habits
 
 -   Put all \`library()\` calls at the top of the script.
 
@@ -85,4 +85,4 @@ The packages in the tidyverse share a common philosophy of data and R programmin
 
 -   Each %>% followed by a new line.
 
--   Avoid long lines (new line after comma).
+-   Avoid long lines (start a new line after comma).
