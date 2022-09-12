@@ -37,8 +37,13 @@ An R package is a collection of functions, data, and documentation that extends 
 
 ### Functions
 
+**Defining tidy data**
+
 ```{r}
 # read data
+readxl::read_xlsx("../data/weather_untidy.xlsx", sheet = "OTT15")
+read.csv("../data/weather_tidy.csv")
+
 ```
 
 ### tidyverse

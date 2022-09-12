@@ -1,4 +1,3 @@
-,,,DOY,Air Temperature,,Relative Humidity,Precip,Precip acc,"2"" Soil Temperature",,Solar Radiation,ETo,
 location,year,date,doy,AirTemp_max,AirTemp_min,RH%,precip_mm,accum_precip_mm,SoilTemp_2in_max,SoilTemp_2in_min,rad_Mjm2,Etc_grass_mm,Etc_alfalfa_mm
 Ottawa,2015,1-Jan,1,0.5,-9.2,67.1,0,0,0.5,-5.2,5.5,0.91,1.42
 Ottawa,2015,2-Jan,2,1.2,-3,86.9,0,0,1,-1.6,2.9,0.47,0.6
