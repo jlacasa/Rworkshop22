@@ -37,7 +37,7 @@ Read the file `tillage.csv` from the "data" folder.
 
 ### 2.2. USDA Census
 
-Read the file `USDAsurvey_00-18.csv` from the "data" folder**.**
+Read the file `USDAsurvey_00-18.csv` from the following url: "https://raw.githubusercontent.com/jlacasa/CiampittiLab-Rworkshop/main/data/USDAsurvey_00-18.csv". Use the read.csv() function normally and see what happens.
 
 **2.2.a.** Create a dataframe that has columns describing: state, county, year, state, average annual yield (US level), average annual yield (state level), and historic standard deviation of yield (state level) (Hint: check out `sd()`).
 
