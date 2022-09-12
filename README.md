@@ -6,6 +6,8 @@ It will help you reduce (human) error in repetitive tasks, save time with automa
 
 While **R** is a programming language, **RStudio** is an IDE (integrated development environment, ~~ "interface"). More on R vs RStudio, [here](https://mgimond.github.io/ES218/R_vs_RStudio.html). More about RStudio [here](https://b-rodrigues.github.io/modern_R/getting-to-know-rstudio.html).  
 
+The objectives of this 2-3 month workshop are to introduce the R environment to the user, along with the tidyverse workflow. By the time you finish, you should be able to master the concept of "tidy data" and know the basics of a data analysis workflow, i.e., (I) download/read the data, (II) perform an exploratory data analysis and do data wrangling, (IV) perform statistical analyses using simple linear models and linear mixed effects models, and (V) interpret and present the results with effective visualizations.  
+
 ## Schedule  
 
 | Week nr. | Date  | Topic  |
