@@ -45,7 +45,7 @@ An R package is a collection of functions, data, and documentation that extends 
 
 The packages in the tidyverse share a common philosophy of data and R programming, and are designed to work together naturally.
 
--   \`select()\`: selects COLUMNS. - from \`dplyr\`
+-   \`**select()**\`: selects **COLUMNS**. - from \`dplyr\`
 
     -   Helper functions:
 
@@ -59,13 +59,15 @@ The packages in the tidyverse share a common philosophy of data and R programmin
 
         -   \`num_range("x", 1:3)\`
 
--   \`filter()\`: selects ROWS that satisfty a logic test
+        -   dplyr::select()
+
+-   \`**filter()**\`: selects **ROWS** that satisfty a logic test
 
     -   Helper function: \`between()\`
 
 -   \`arrange()\`: reorders rows
 
--   \`mutate()\`: creates a new column. \`.keep\` = T/F
+-   \`**mutate()**\`: creates a new column. \`.keep\` = T/F
 
 -   \`rename()\`: renames columns
 
