@@ -18,7 +18,7 @@ Welcome to the 2022 version of this workshop!
 | 6 | 10/27/2022 | CARLOS |
 | 7 | 10/25/2022 | Mixed effects models I |
 | 8 | 11/01/2022 | Mixed effects models II |
-| 9 | 11/08/2022 | Wrapup |
+| 9 | 11/08/2022 | Wrap-up |
 | 10 | 11/15/2022 | Work on project |
 | 11 | 11/22/2022 | Work on project |
 | 12 | 11/29/2022 | Work on project |

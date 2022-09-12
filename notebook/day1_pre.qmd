@@ -93,3 +93,13 @@ The packages in the tidyverse share a common philosophy of data and R programmin
 -   Each %>% followed by a new line.
 
 -   Avoid long lines (start a new line after comma).
+
+## Class project
+
+Find a student/visiting scholar who matches your style + has the skills you want to work on!
+
+Get data and think of ideas.
+
+## Assignments
+
+Check here.
