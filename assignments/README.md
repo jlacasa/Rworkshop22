@@ -1,4 +1,4 @@
-# Brief note on the assingments  
+# Brief note on the assignments  
 
 Assignments are meant to practice coding in the tidyverse and promote good coding habits.  
 The datasets are usually free to download, or the `iris` or `cars` datasets that come with R.  
