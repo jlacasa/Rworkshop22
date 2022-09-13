@@ -9,7 +9,7 @@ format:
 
 ## Welcome!
 
-[**Purpose of this workshop**]{.ul}
+### Brief intro to R
 
 R as a calculator
 
@@ -30,6 +30,10 @@ Objects
 ```{r}
 
 ```
+
+### Types of data
+
+![](images/data_structures.png)
 
 ### Packages
 
