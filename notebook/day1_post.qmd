@@ -1,0 +1,192 @@
+---
+title: "Day 1 - Intro"
+format:
+  html:
+    theme: litera
+    toc: true
+    number-sections: true
+---
+
+## Welcome!
+
+### Brief intro to R
+
+R as a calculator
+
+```{r}
+5+5
+3*2
+```
+
+Boolean operators (logical result)
+
+\`\>\`, \`\<\`, \`==\`, \`!=\`
+
+```{r}
+3>2
+3<2
+3!=3
+```
+
+Objects
+
+```{r}
+a <- c(3,3)
+a <- "hola"
+```
+
+### Types of data
+
+![](images/data_structures.png)
+
+```{r}
+class(3)
+class("a")
+class(c("a", 9, 2))
+class(TRUE)
+class(factor("a"))
+
+```
+
+```{r}
+y <- c(4,5,7.8,6,4,3)
+mean(y)
+
+```
+
+### Packages
+
+An R package is a collection of functions, data, and documentation that extends the capabilities of base R [\[R4DS\]](https://r4ds.had.co.nz/introduction.html#r).
+
+```{r}
+library(tidyverse)
+```
+
+### Functions
+
+**Defining tidy data**
+
+```{r}
+# read data
+readxl::read_xlsx("../data/weather_untidy.xlsx", sheet = "OTT15")
+df <- read.csv("../data/weather_tidy.csv")
+df
+```
+
+### tidyverse
+
+The packages in the tidyverse share a common philosophy of data and R programming, and are designed to work together naturally.
+
+-   \`**select()**\`: selects **COLUMNS**. - from \`dplyr\`
+
+    ```{r}
+    glimpse(df)
+    print(df)
+    df1 <- select(df,
+                  c(date, doy, AirTemp_max))
+      
+    ```
+
+    -   Helper functions:
+
+        -   \`starts_with("abc")\`
+        
+```{r}
+dplyr::select(df,
+              starts_with("AirTemp"))
+
+```
+
+        -   \`ends_with("xyz")\`
+
+        -   \`contains("ijk")\`
+
+        -   \`matches("(.)\\\\1")\`: variables that match a regular expression (repeated characters)
+
+        -   \`num_range("x", 1:3)\`
+
+        -   dplyr::select()
+
+-   \`**filter()**\`: selects **ROWS** that satisfty a logic test
+
+```{r}
+df1 <- dplyr::filter(df, AirTemp_max > 10 & AirTemp_min > 5)
+```
+
+    -   Helper function: \`between()\`
+
+```{r}
+df2 <- dplyr::filter(df1, dplyr::between(precip_mm, 2, 10))
+```
+
+-   \`arrange()\`: reorders rows
+```{r}
+df3 <- arrange(df2, desc(precip_mm))
+```
+
+-   \`**mutate()**\`: creates a new column. \`.keep\` = T/F
+```{r}
+df4 <- mutate(df3, 
+       AirTemp_mean = .5*(AirTemp_max + AirTemp_min),
+       country = "USA",
+       .before = AirTemp_max)
+```
+
+-   \`rename()\`: renames columns
+
+```{r}
+df5 <- rename(df4, 
+       temp_max = AirTemp_max,
+       temp_min = AirTemp_min,
+       temp_mean = AirTemp_mean
+       )
+```
+
+
+# The piper operator
+```{r}
+#filter airtemp
+dplyr::filter(df, AirTemp_max > 10 & AirTemp_min > 5) %>% 
+  
+  dplyr::filter(dplyr::between(precip_mm, 2, 10)) %>% 
+  
+  arrange(desc(precip_mm)) %>% 
+  mutate(
+    AirTemp_mean = .5*(AirTemp_max + AirTemp_min),
+    country = "USA",
+    .before = AirTemp_max) %>%
+  rename(temp_max = AirTemp_max,
+       temp_min = AirTemp_min,
+       temp_mean = AirTemp_mean
+       )
+
+```
+
+
+## Good coding habits
+
+-   Put all \`library()\` calls at the top of the script.
+
+-   Organize your files into \`data\`, \`notebook\`/\`markdown\`, \`output\`.
+
+-   Comment your code.
+
+-   Object names:
+
+    -   Don't start with numbers
+
+    -   Shortest understandable
+
+-   Each %>% followed by a new line.
+
+-   Avoid long lines (start a new line after comma).
+
+## Class project
+
+Find a student/visiting scholar who matches your style + has the skills you want to work on!
+
+Get data and think of ideas.
+
+## Assignments
+
+Check here.
