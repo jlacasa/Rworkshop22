@@ -1,8 +1,8 @@
 # Rworkshop22  
 Welcome to the 2022 version of this workshop!  
 ## Motivation and Objectives  
-R is a a free software environment for statistical computing and graphics.  
-It will help you reduce (human) error in repetitive tasks, save time with automatization, obtain statistically sond and reproducible results, effective visualizations, and much more.  
+This workshop started in 2021 as a learning environment for visiting scholars at K-State, to learn the basics of R programming and refresh some concepts in applied statistics. Ideally, you will gain skills that will help succeed you in industry/grad school. This workshop is a primer to gain skills in programming and applied statistics.    
+**Why R?** R is a a free software environment for statistical computing and graphics. It will help you reduce (human) error in repetitive tasks, save time with automatization, obtain statistically sond and reproducible results, effective visualizations, and much more.  
 
 While **R** is a programming language, **RStudio** is an IDE (integrated development environment, ~~ "interface"). More on R vs RStudio, [here](https://mgimond.github.io/ES218/R_vs_RStudio.html). More about RStudio [here](https://b-rodrigues.github.io/modern_R/getting-to-know-rstudio.html).  
 
