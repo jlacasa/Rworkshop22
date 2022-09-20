@@ -1,0 +1,53 @@
+---
+title: "Week 2"
+format:
+  html:
+    theme: litera
+    toc: true
+    number-sections: true
+---
+
+
+## 1. Libraries  
+```{r}
+
+```
+
+## Review on tidyverse functions  
+```{r}
+# mutate
+
+# filter
+
+# dplyr::select
+```
+
+## New functions  
+
+### Data wrangling  
+```{r}
+# pivot longer
+
+# pivot wider
+```
+
+### Names   
+```{r}
+# case_when
+
+
+```
+
+```{r}
+
+```
+
+# ggplot2  
+
+- [Some cool examples](https://www.cedricscherer.com/top/dataviz/).  
+
+```{r}
+ndata_plant <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2)
+glimpse(ndata_plant)
+```
+
