@@ -38,6 +38,7 @@ format:
 
 ```
 
+### left_join  
 ```{r}
 
 ```
@@ -86,3 +87,7 @@ ndata_plant %>%
 ### Coordinates  
 
 
+### Facets  
+
+
+### Themes  
