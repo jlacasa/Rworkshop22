@@ -51,3 +51,38 @@ ndata_plant <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurement
 glimpse(ndata_plant)
 ```
 
+```{r}
+ndata_plant %>% 
+  mutate(across(where(is.character), ~na_if(., ".")))
+```
+
+
+## Structure  
+
+
+1. Data  
+2. Layers `geom_*()` and `stat_*()`  
+3. Aesthetics `aes()`  
+4. Scales `scale_*()`  
+5. Coordinate system `coord_*()`  
+6. Facets `facet_*()` arrangement of the data into a grid of plots  
+7. Visual themes `theme()` visual defaults  
+
+### Start with a white canvas  
+
+```{r}
+
+```
+
+### Add geoms  
+
+
+### Arrange aesthetics  
+
+
+### Scales  
+
+
+### Coordinates  
+
+
