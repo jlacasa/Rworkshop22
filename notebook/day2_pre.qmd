@@ -40,7 +40,7 @@ format:
 
 ### left_join  
 ```{r}
-
+left_join()
 ```
 
 # ggplot2  
@@ -49,6 +49,7 @@ format:
 
 ```{r}
 ndata_plant <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2)
+
 glimpse(ndata_plant)
 ```
 
@@ -91,3 +92,10 @@ ndata_plant %>%
 
 
 ### Themes  
+
+
+## Practice  
+Using the N initiative data:   
+1. Plot Yield versus plant density. Distinguish between states and years using facets and colors.  
+2. Read the Site data and characterize the states according to their TOC content.  
+3. Using the plant data, plot N content versus growth stage (v5 or v9) for the states with data available. 
