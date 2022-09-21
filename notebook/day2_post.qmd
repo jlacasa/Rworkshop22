@@ -102,7 +102,7 @@ ndata_plant <- ndata_plant %>%
 ggplot(ndata_plant)
 ```
 
-1. Data  
+### 1. Data. Start with a white canvas  
 
 white canvas:
 
@@ -111,14 +111,17 @@ ndata_plant %>%
   ggplot(aes(x = Plnt_Pop, y = Yield_SY))
 ```
 
-2. Layers `geom_*()` and `stat_*()`  
+
+### 2. Add geoms  
+Layers of `geom_*()` and `stat_*()`  
 ```{r}
 ndata_plant %>% 
   ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
   geom_point()
 ```
 
-3. Aesthetics `aes()`  
+### 3. Arrange aesthetics (aes())  
+
 ```{r}
 ndata_plant %>% 
   ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
@@ -127,7 +130,7 @@ ndata_plant %>%
              size =.3)
 ```
 
-4. Scales `scale_*()`  
+### 4. Scales  `scale_*()`   
 ```{r}
 ndata_plant %>% 
   ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
@@ -137,7 +140,7 @@ ndata_plant %>%
   scale_color_viridis_d()
 ```
 
-5. Coordinate system `coord_*()`  
+### 5. Coordinate system `coord_*()`  
 ```{r}
 
 ndata_plant %>% 
@@ -149,7 +152,7 @@ ndata_plant %>%
   coord_cartesian(xlim = c(25000,30000))
 ```
 
-6. Facets `facet_*()` arrangement of the data into a grid of plots  
+### 6. Facets `facet_*()` arrangement of the data into a grid of plots  
 ```{r}
 ndata_plant %>% 
   ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
@@ -164,27 +167,8 @@ ndata_plant %>%
 
 7. Visual themes `theme()` visual defaults  
 
-### Start with a white canvas  
-
 ```{r}
-
+# try +theme_bw() or +theme_classic()
 ```
-
-### Add geoms  
-
-
-### Arrange aesthetics  
-
-
-### Scales  
-
-
-### Coordinates  
-
-
-### Facets  
-
-
-### Themes  
 
 
