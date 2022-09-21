@@ -1,0 +1,190 @@
+---
+title: "Week 2"
+format:
+  html:
+    theme: litera
+    toc: true
+    number-sections: true
+---
+
+
+## 1. Libraries  
+```{r}
+library(tidyverse)
+```
+
+```{r}
+df <- read.csv("../data/weather_tidy.csv")
+```
+
+## Review on tidyverse functions  
+```{r}
+# mutate
+df %>% 
+  mutate(AIrTemp_mean = (AirTemp_max+AirTemp_min)/2)
+
+# filter
+df %>% 
+  filter(AirTemp_max>10)
+# dplyr::select
+
+df_new <- df %>%
+  dplyr::select(location, year)
+```
+
+## New functions  
+
+### Data wrangling  
+```{r}
+# pivot longer
+df_temp <- read.csv("../data/weather_tidy.csv") %>% 
+  dplyr::select(location:AirTemp_min) %>% 
+  pivot_longer(cols = c(AirTemp_max, AirTemp_min))
+```
+
+```{r}
+df <- read.csv("../data/weather_tidy.csv")
+# group_by
+df %>% 
+  separate(date, c("day", "month"), sep = "-") %>% 
+  group_by(month) %>%
+  summarise(month_mean_max = mean(AirTemp_max),
+            month_mean_min = mean(AirTemp_min))
+```
+
+### Names   
+```{r}
+# case_when
+
+
+```
+
+### left_join  
+```{r}
+left_join()
+```
+
+# ggplot2  
+
+- [Some cool examples](https://www.cedricscherer.com/top/dataviz/).  
+- Rgraphgallery  
+
+```{r}
+# 49 trials of N fertilization in corn across several states in the US
+ndata_plant <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 'All_Plant')
+
+glimpse(ndata_plant)
+colnames(ndata_plant)
+summary(ndata_plant)
+```
+
+```{r}
+df %>% 
+  mutate(across(AirTemp_max:AirTemp_min, 
+                ~round(., 0)))
+  # mutate(AirTemp_max = round(AirTemp_max, 0),
+  #        AirTemp_min = round(AirTemp_min, 0))
+```
+
+
+```{r}
+ndata_plant <- ndata_plant %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:Yield_SY,
+                ~as.numeric(.)))
+```
+
+
+## Structure  
+
+```{r}
+ggplot(ndata_plant)
+```
+
+1. Data  
+
+white canvas:
+
+```{r}
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))
+```
+
+2. Layers `geom_*()` and `stat_*()`  
+```{r}
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
+  geom_point()
+```
+
+3. Aesthetics `aes()`  
+```{r}
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
+  geom_point(aes(color = State,
+                 shape = factor(Year)),
+             size =.3)
+```
+
+4. Scales `scale_*()`  
+```{r}
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
+  geom_point(aes(color = State,
+                 shape = factor(Year)),
+             size =.3)+
+  scale_color_viridis_d()
+```
+
+5. Coordinate system `coord_*()`  
+```{r}
+
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
+  geom_point(aes(color = State,
+                 shape = factor(Year)),
+             size =.3)+
+  scale_color_viridis_d()+
+  coord_cartesian(xlim = c(25000,30000))
+```
+
+6. Facets `facet_*()` arrangement of the data into a grid of plots  
+```{r}
+ndata_plant %>% 
+  ggplot(aes(x = Plnt_Pop, y = Yield_SY))+
+  geom_point(aes(color = factor(Year),
+                 shape = factor(Year)),
+             size =.3)+
+  scale_color_viridis_d()+
+  facet_wrap(~State)
+```
+
+
+
+7. Visual themes `theme()` visual defaults  
+
+### Start with a white canvas  
+
+```{r}
+
+```
+
+### Add geoms  
+
+
+### Arrange aesthetics  
+
+
+### Scales  
+
+
+### Coordinates  
+
+
+### Facets  
+
+
+### Themes  
+
+
