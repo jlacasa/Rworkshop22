@@ -13,7 +13,7 @@ The objectives of this 2-3 month workshop are to introduce the R environment to 
 | Week nr. | Date  | Topic  |
 | :-----: | :-: | :-: |
 | 1 | 09/13/2022 | [Intro to R, types of data, tidyverse](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day1_post.qmd) |
-| 2 | 09/20/2022 | tidyverse, ggplot, plot maps |
+| 2 | 09/20/2022 | [tidyverse, ggplot](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day2_post.qmd) |
 | 3 | 09/27/2022 | tidy data, review, workflow intro |
 | 4 | 10/04/2022 | Linear models I |
 | 4 | 10/06/2022 | Geospatial topics I |
