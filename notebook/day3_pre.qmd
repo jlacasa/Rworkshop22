@@ -122,6 +122,23 @@ crop_info %>%
 ### The basics  
 (1) Read the dataframe "8.Yield_Plant_Measurements.xlsx" and plot boxplots of yield at 14% humidity for each state. Make another plot that has many mini-boxplots, one per year.   
 
+
+(2) You just received a dataset in this url: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv. Read it, check it out and visualize the decrease in the yield gap of soybeans, wheat, maize and rice for 5 countries of your choice.  
+
+
+(2)   
+
+### More advanced  
+(1) Take the dataset "1.Site_Characterization.xlsx" and join it to "11.Irrigation.xlsx". Use this dataframe to create a plot that relates water content (WC) with Irrigation (mm). Use mean values of WC and yield for each combination of [Trial#, Year, State, Site], but show standard errors. Show a line of a quadratic function fitted with `geom_smooth` to show the trend in the data.    
+(2) Using "8.Yield_Plant_Measurements.xlsx", create a categorical yield column that is "very low" for yield<4 tn ha^{-1}, "low" if $4 \leq yield \lt 7$, "medium" if $7 \leq yield \lt 10$,  "high" if $10 \leq yield \lt 12$ and "very high if $yield  \geq 12$. Hint: use function `case_when()`. Create a plot that shows the    
+(3) Using "11.Irrigation.xlsx", build a plot that shows cumulative irrigation versus time. Hint: use the group_by() and cumsum() functions.  
+
+
+## 5. Solutions (suggestions)  
+
+### The basics  
+
+### 1  
 ```{r}
 crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
   mutate(across(where(is.character), 
@@ -141,7 +158,7 @@ crop_info %>%
        fill = "Year")
 ```
 
-(2) You just received a dataset in this url: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv. Read it, check it out and visualize the decrease in the yield gap of soybeans, wheat, maize and rice for 5 countries of your choice.  
+### 2  
 ```{r}
 url <- "https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv"
 
@@ -153,7 +170,12 @@ glimpse(data_2)
 
 summary(data_2)
 
+#what countries do we have?
 unique(data_2$Entity)
+
+#how many different countries are there?
+n_distinct(data_2$Entity)
+
 
 data_2 %>%
   dplyr::select(contains(c("Entity", "Year", "wheat", "maize", "rice", "soybean")) &
@@ -171,18 +193,6 @@ data_2 %>%
        y = expression(Yield~Gap~(tn~ha^{-1})))+
   theme_classic()
 ```
-
-(2)   
-
-### More advanced  
-(1) Take the dataset "1.Site_Characterization.xlsx" and join it to "11.Irrigation.xlsx". Use this dataframe to create a plot that relates water content (WC) with Irrigation (mm). Use mean values of WC and yield for each combination of [Trial#, Year, State, Site], but show standard errors. Show a line of a quadratic function fitted with `geom_smooth` to show the trend in the data.    
-(2) Using "8.Yield_Plant_Measurements.xlsx", create a categorical yield column that is "very low" for yield<4 tn ha^{-1}, "low" if $4 \leq yield \lt 7$, "medium" if $7 \leq yield \lt 10$,  "high" if $10 \leq yield \lt 12$ and "very high if $yield  \geq 12$. Hint: use function `case_when()`. Create a plot that shows the    
-(3) Using "11.Irrigation.xlsx", build a plot that shows cumulative irrigation versus time. Hint: use the group_by() and cumsum() functions.  
-
-
-## 5. Solutions (suggestions)  
-
-
 ### More advanced  
 ### 1  
 
