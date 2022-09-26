@@ -119,16 +119,87 @@ crop_info %>%
 
 ## 4. Practice  
 
+### The basics  
+(1) Read the dataframe "8.Yield_Plant_Measurements.xlsx" and plot boxplots of yield at 14% humidity for each state. Make another plot that has many mini-boxplots, one per year.   
+
+```{r}
+crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+
+crop_info %>% 
+  ggplot(aes(State, GYdry/(.86*1000)))+
+  geom_boxplot(aes(fill= State))+
+  labs(y = expression(Grain~Yield~(tn~ha^{-1})))
+
+crop_info %>% 
+  ggplot(aes(State, GYdry/(.86*1000)))+
+  geom_boxplot(aes(fill=factor(Year)), position = position_dodge())+
+  labs(y = expression(Grain~Yield~(tn~ha^{-1})),
+       fill = "Year")
+```
+
+(2) You just received a dataset in this url: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv. Read it, check it out and visualize the decrease in the yield gap of soybeans, wheat, maize and rice for 5 countries of your choice.  
+```{r}
+url <- "https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv"
+
+data_2 <- read.csv(url)
+
+colnames(data_2)
+
+glimpse(data_2)
+
+summary(data_2)
+
+unique(data_2$Entity)
+
+data_2 %>%
+  dplyr::select(contains(c("Entity", "Year", "wheat", "maize", "rice", "soybean")) &
+                  !contains("attainable")) %>%
+  filter(Entity %in% c("Argentina", "Brazil", "Honduras","United States", "Uruguay")) %>% 
+  pivot_longer(cols = -c(Entity, Year)) %>% 
+  filter(value !=0) %>% 
+  #keep only the crop in the name
+  separate(name, c("crop", NA)) %>%
+  mutate(crop = stringr::str_to_title(crop)) %>% 
+  ggplot(aes(Year, value))+
+  geom_line(aes(group = Entity, color = Entity))+
+  facet_wrap(~crop, scales = "free")+
+  labs(color = "Country",
+       y = expression(Yield~Gap~(tn~ha^{-1})))+
+  theme_classic()
+```
+
+(2)   
+
+### More advanced  
 (1) Take the dataset "1.Site_Characterization.xlsx" and join it to "11.Irrigation.xlsx". Use this dataframe to create a plot that relates water content (WC) with Irrigation (mm). Use mean values of WC and yield for each combination of [Trial#, Year, State, Site], but show standard errors. Show a line of a quadratic function fitted with `geom_smooth` to show the trend in the data.    
 (2) Using "8.Yield_Plant_Measurements.xlsx", create a categorical yield column that is "very low" for yield<4 tn ha^{-1}, "low" if $4 \leq yield \lt 7$, "medium" if $7 \leq yield \lt 10$,  "high" if $10 \leq yield \lt 12$ and "very high if $yield  \geq 12$. Hint: use function `case_when()`. Create a plot that shows the    
 (3) Using "11.Irrigation.xlsx", build a plot that shows cumulative irrigation versus time. Hint: use the group_by() and cumsum() functions.  
 
 
 ## 5. Solutions (suggestions)  
+
+
+### More advanced  
 ### 1  
 
 ```{r}
-data_assgnm1 <- site_info %>% 
+crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+site_info <- readxl::read_xlsx("../data/N_initiative/1.Site_Characterization.xlsx", sheet = 2) %>% 
+  rename(`Trial#` = `Trail#`) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(Clay:WC,
+                ~as.numeric(.)))
+
+data_adv1 <- site_info %>% 
   left_join(crop_info) %>% 
   unite("LocationYr", c("Site", "State", "Year"), sep = ", ", remove = F) %>% 
   mutate(GYdry = GYdry/1000) %>% 
@@ -139,7 +210,7 @@ data_assgnm1 <- site_info %>%
             GY_se = plotrix::std.error(GYdry, na.rm = TRUE)) %>% 
   ungroup()
 
-data_assgnm1 %>% 
+data_adv1 %>% 
   ggplot(aes(WC_mean, GY))+
   geom_smooth(se = F, method = 'lm', formula = y ~ x +I(x^2), color = 'grey30', alpha = .8, linetype = 2)+
   geom_errorbar(aes(ymin = GY-GY_se, ymax = GY+GY_se, color = State))+
@@ -153,7 +224,13 @@ data_assgnm1 %>%
 ### 2  
 
 ```{r}
-data_assgnm2 <- crop_info %>% 
+crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+
+data_adv2 <- crop_info %>% 
   drop_na(GYdry) %>% 
   mutate(yield_cat = case_when(GYdry<4000 ~ "very low",
                                (GYdry >= 4000 & GYdry < 7000) ~ "low",
@@ -162,7 +239,7 @@ data_assgnm2 <- crop_info %>%
                                (GYdry >= 12000) ~ "very high") %>% 
            factor(levels = c("very low", "low", "medium", "high", "very high"))) 
 
-data_assgnm2 %>% 
+data_adv2 %>% 
   ggplot(aes(State))+
   ggpubr::theme_pubclean()+
   labs(fill = "Yield level")+
@@ -172,7 +249,12 @@ data_assgnm2 %>%
 ### 3  
 ```{r}
 # Solution to (3)
-data_assgnm3 <- 
+irrig_info <- readxl::read_xlsx("../data/N_initiative/11.Irrigation.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(HOBO_flag= as.numeric(HOBO_flag))
+
+data_adv3 <- 
   irrig_info %>% 
   group_by(`Trial#`, Year, State, Site) %>% 
   arrange(DOY) %>% 
@@ -181,7 +263,7 @@ data_assgnm3 <-
   unite("LocationYr", c("Site", "State", "Year"), sep = ", ", remove = F) %>%
   ungroup()
 
-data_assgnm3 %>% 
+data_adv3 %>% 
   ggplot(aes(month_day, irrig_cum, group = factor(LocationYr), color =  factor(LocationYr)))+
   geom_line()+
   geom_point()+
