@@ -1,0 +1,196 @@
+---
+title: "Untitled"
+format:
+  html:
+    theme: litera
+    toc: true
+    number-sections: true
+---
+# Overview  
+
+1. Code structure  
+2. Basic functions review (kahoot)  
+3. Workflow  
+4. New: left_join, 
+
+## 1. Libraries
+
+```{r, echo=FALSE}
+library(tidyverse)
+```
+
+[Tidy data tutor](https://tidydatatutor.com/vis.html)  
+
+## 2. Data
+
+```{r, warning=FALSE}
+crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+```
+
+```{r}
+site_info <- readxl::read_xlsx("../data/N_initiative/1.Site_Characterization.xlsx", sheet = 2) %>% 
+  rename(`Trial#` = `Trail#`) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(Clay:WC,
+                ~as.numeric(.)))
+```
+
+```{r}
+irrig_info <- readxl::read_xlsx("../data/N_initiative/11.Irrigation.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(HOBO_flag= as.numeric(HOBO_flag))
+```
+
+## 3. Exploratory data analysis
+
+```{r}
+crop_info %>% 
+  mutate(Site_Prod = factor(Site_Prod, levels = c("Low", "High"))) %>% 
+  ggplot(aes(State, Yield_SY))+
+  geom_boxplot(aes(fill = Site_Prod))+
+  facet_wrap(~Year)+
+  theme(aspect.ratio = .7)
+```
+
+```{r}
+# irrig_info %>% 
+#   unite("location", c("Site", "State"), sep = ", ", remove = F) %>% 
+#   ggplot(aes(location, Irrg_mm))+
+#   geom_col(aes(fill = factor(Year), group = factor(Year)), position = position_dodge())+
+#   labs(fill = "Year",
+#        y = "Irrigation (mm)")+
+#   theme_bw()+
+#   scale_fill_manual(values = c("#4E6766", "#5AB1BB", "#A5C882"))+
+#   theme(axis.title.x = element_blank())
+
+```
+
+## Left_join()
+
+```{r}
+crop_info %>% 
+  left_join(site_info)
+```
+
+```{r}
+## Re-do  
+site_info <- readxl::read_xlsx("../data/N_initiative/1.Site_Characterization.xlsx", sheet = 2) %>% 
+  rename(`Trial#` = `Trail#`) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(c(Block, Clay:WC),
+                ~as.numeric(.)))
+```
+
+```{r}
+crop_info %>%
+  right_join(irrig_info) %>%# colnames()
+  group_by(Year, State, Site, `Trial#`, Plant_N_SI, Side_N_SI, GYdry) %>% 
+  summarise(Irrg_tot_mm = sum(Irrg_mm),
+             # GYdry = mean(GYdry),
+            Napplied = Plant_N_SI + Side_N_SI) %>%
+  ungroup() %>% 
+  unite("Location", c("Site", "State"), sep = ", ", remove = F) %>%
+  ggplot(aes(Napplied, GYdry/1000))+
+  geom_point(aes(color = Irrg_tot_mm))+
+  labs(color = "Total irrigation (mm)",
+       y = expression(Yield~(tn~ha^{-1})),
+       x = "Irrigation (mm)")+
+  theme_bw()
+# ggpubr
+```
+
+```{r}
+crop_info %>% 
+  left_join(site_info) %>% 
+  ggplot(aes(Clay, TotdryM))+
+  geom_point()
+```
+
+## Workflow
+
+![](images/tidyverse_workflow.png)
+
+## 4. Practice  
+
+(1) Take the dataset "1.Site_Characterization.xlsx" and join it to "11.Irrigation.xlsx". Use this dataframe to create a plot that relates water content (WC) with Irrigation (mm). Use mean values of WC and yield for each combination of [Trial#, Year, State, Site], but show standard errors. Show a line of a quadratic function fitted with `geom_smooth` to show the trend in the data.    
+(2) Using "8.Yield_Plant_Measurements.xlsx", create a categorical yield column that is "very low" for yield<4 tn ha^{-1}, "low" if $4 \leq yield \lt 7$, "medium" if $7 \leq yield \lt 10$,  "high" if $10 \leq yield \lt 12$ and "very high if $yield  \geq 12$. Hint: use function `case_when()`. Create a plot that shows the    
+(3) Using "11.Irrigation.xlsx", build a plot that shows cumulative irrigation versus time. Hint: use the group_by() and cumsum() functions.  
+
+
+## 5. Solutions (suggestions)  
+### 1  
+
+```{r}
+data_assgnm1 <- site_info %>% 
+  left_join(crop_info) %>% 
+  unite("LocationYr", c("Site", "State", "Year"), sep = ", ", remove = F) %>% 
+  mutate(GYdry = GYdry/1000) %>% 
+  group_by(`Trial#`, Year, State, Site, LocationYr) %>% 
+  summarise(WC_mean = mean(WC, na.rm = TRUE),
+            WC_se = plotrix::std.error(WC, na.rm = TRUE),
+            GY = mean(GYdry, na.rm = TRUE),
+            GY_se = plotrix::std.error(GYdry, na.rm = TRUE)) %>% 
+  ungroup()
+
+data_assgnm1 %>% 
+  ggplot(aes(WC_mean, GY))+
+  geom_smooth(se = F, method = 'lm', formula = y ~ x +I(x^2), color = 'grey30', alpha = .8, linetype = 2)+
+  geom_errorbar(aes(ymin = GY-GY_se, ymax = GY+GY_se, color = State))+
+  geom_errorbarh(aes(xmin = WC_mean-WC_se, xmax = WC_mean+WC_se, color = State))+
+  ggpubr::theme_pubclean()+
+  labs(y = expression(Grain~Yield~(Mg~ha^{-1})),
+       x = "Water content (%)")+
+  geom_point(aes(color = State))
+```
+
+### 2  
+
+```{r}
+data_assgnm2 <- crop_info %>% 
+  drop_na(GYdry) %>% 
+  mutate(yield_cat = case_when(GYdry<4000 ~ "very low",
+                               (GYdry >= 4000 & GYdry < 7000) ~ "low",
+                               (GYdry >= 7000 & GYdry < 10000) ~ "medium",
+                               (GYdry >= 10000 & GYdry < 12000) ~ "high",
+                               (GYdry >= 12000) ~ "very high") %>% 
+           factor(levels = c("very low", "low", "medium", "high", "very high"))) 
+
+data_assgnm2 %>% 
+  ggplot(aes(State))+
+  ggpubr::theme_pubclean()+
+  labs(fill = "Yield level")+
+  geom_bar(aes(fill = yield_cat), position = position_dodge())
+```
+
+### 3  
+```{r}
+# Solution to (3)
+data_assgnm3 <- 
+  irrig_info %>% 
+  group_by(`Trial#`, Year, State, Site) %>% 
+  arrange(DOY) %>% 
+  mutate(irrig_cum = cumsum(Irrg_mm), .after = Irrg_mm, 
+         month_day = format(Date, "%m/%d") %>% as.Date("%m/%d")) %>% 
+  unite("LocationYr", c("Site", "State", "Year"), sep = ", ", remove = F) %>%
+  ungroup()
+
+data_assgnm3 %>% 
+  ggplot(aes(month_day, irrig_cum, group = factor(LocationYr), color =  factor(LocationYr)))+
+  geom_line()+
+  geom_point()+
+  labs(color = "Location & Year",
+       x= "Day of the year",
+       y = "Cumulative Irrigation (mm)")+
+  ggpubr::theme_pubclean()+
+  theme(legend.position = c(.2, .7),
+        legend.direction = "vertical")
+```
+
+
