@@ -11,7 +11,8 @@ format:
 1. Code structure  
 2. Basic functions review (kahoot)  
 3. Workflow  
-4. New: left_join, 
+4. New: left_join  
+5. 
 
 ## 1. Libraries
 
@@ -103,7 +104,7 @@ crop_info %>%
        y = expression(Yield~(tn~ha^{-1})),
        x = "Irrigation (mm)")+
   theme_bw()
-# ggpubr
+# ggpubr::
 ```
 
 ```{r}
@@ -126,7 +127,10 @@ crop_info %>%
 (2) You just received a dataset in this url: https://raw.githubusercontent.com/owid/owid-datasets/master/datasets/Attainable%20yields%20(Mueller%20et%20al.%202012)/Attainable%20yields%20(Mueller%20et%20al.%202012).csv. Read it, check it out and visualize the decrease in the yield gap of soybeans, wheat, maize and rice for 5 countries of your choice.  
 
 
-(2)   
+(3) Use the data from (1) and visualize the yields from 2015 versus 2014 and 2016. Use the same coordinates for x and y axes.   
+
+
+
 
 ### More advanced  
 (1) Take the dataset "1.Site_Characterization.xlsx" and join it to "11.Irrigation.xlsx". Use this dataframe to create a plot that relates water content (WC) with Irrigation (mm). Use mean values of WC and yield for each combination of [Trial#, Year, State, Site], but show standard errors. Show a line of a quadratic function fitted with `geom_smooth` to show the trend in the data.    
@@ -193,7 +197,31 @@ data_2 %>%
        y = expression(Yield~Gap~(tn~ha^{-1})))+
   theme_classic()
 ```
+
+### 3  
+
+```{r}
+crop_info <- readxl::read_xlsx("../data/N_initiative/8.Yield_Plant_Measurements.xlsx", sheet = 2) %>% 
+  mutate(across(where(is.character), 
+                ~na_if(., "."))) %>% 
+  mutate(across(VTPwet:R4N,
+                ~as.numeric(.)))
+crop_info %>% 
+  dplyr::select(State, Year, GYdry, Site, Plot_ID) %>% 
+  pivot_wider(names_from = Year, 
+              values_from = GYdry) %>% 
+  ggplot(aes(`2015`, `2016`))+
+  geom_point()+
+  geom_point(aes(y=`2014`), shape = 21, fill = 'gold')+
+  geom_abline(slope = 1)+
+  coord_cartesian(xlim = c(min(crop_info$GYdry, na.rm = T), max(crop_info$GYdry, na.rm = T)),
+                  ylim = c(min(crop_info$GYdry, na.rm = T), max(crop_info$GYdry, na.rm = T)))+
+  theme(aspect.ratio = 1,
+        panel.grid = element_blank())
+```
+
 ### More advanced  
+
 ### 1  
 
 ```{r}
@@ -206,7 +234,7 @@ site_info <- readxl::read_xlsx("../data/N_initiative/1.Site_Characterization.xls
   rename(`Trial#` = `Trail#`) %>% 
   mutate(across(where(is.character), 
                 ~na_if(., "."))) %>% 
-  mutate(across(Clay:WC,
+  mutate(across(c(Block, Clay:WC),
                 ~as.numeric(.)))
 
 data_adv1 <- site_info %>% 
