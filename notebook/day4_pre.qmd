@@ -1,0 +1,108 @@
+---
+title: "Day 4"
+format: html
+editor: visual
+---
+
+### Libraries  
+```{r}
+library(tidyverse)
+library(readxl)
+library(wiqid)
+```
+
+### Data  
+```{r, warning=FALSE}
+data4 <- read.csv("../data/day4_data.csv") %>% 
+  rename(Site = TRT#,
+         # N_kgha = N_fert,
+         # SOM_perc = SOM
+         ) 
+```
+
+### Exploratory data analysis  
+```{r}
+glimpse(data4)
+summary(data4)
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(GY_mgha))+
+  geom_histogram()
+```
+
+```{r}
+data4 %>%
+  pivot_longer(cols = -c(ID, Site)) %>% 
+  ggplot(aes(value))+
+  geom_histogram()+
+  facet_wrap(~name, scales = 'free')+
+  theme(aspect.ratio = 1)
+```
+
+```{r}
+unique(data4$Site)
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(factor(Site), SOM))+
+  geom_boxplot()
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(factor(Site), GY_mgha))+
+  geom_boxplot()
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(N_fert, GY_mgha))+
+  geom_point()+
+  geom_smooth(method = "lm")
+```
+
+
+### Analysis  
+```{r}
+m1 <- lm(GY_mgha ~ Site, data = data4)
+```
+
+```{r}
+car::Anova(m1)
+```
+
+```{r}
+m2 <- lm(GY_mgha ~ factor(Site), data = data4)
+summary(m2)
+```
+
+```{r}
+m3 <- lm(GY_mgha ~ 0 + factor(Site), data = data4) 
+
+plot(m3)
+car::leveneTest(GY_mgha ~ 0 + factor(Site), data = data4)
+```
+
+```{r}
+m4 <- lm(GY_mgha ~ 0+ N_fert, data = data4) 
+plot(m4)
+```
+
+```{r}
+m5 <- lm(GY_mgha ~  N_fert, data = data4) 
+plot(m5)
+```
+
+```{r}
+m6 <- lm(GY_mgha ~  N_fert + factor(Site), data = data4) 
+plot(m6)
+summary(m6)
+```
+
+```{r}
+AICtable(AICc(m4, m5, m6))
+```
+
