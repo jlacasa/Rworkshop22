@@ -1,0 +1,174 @@
+---
+title: "Day 4"
+format: html
+editor: visual
+---
+
+### Libraries  
+```{r}
+library(tidyverse)
+library(wiqid)
+```
+
+### Data  
+```{r, warning=FALSE}
+data4 <- read.csv("../data/day4_data.csv") %>% 
+  rename(Site = TRT#,
+         # N_kgha = N_fert,
+         # SOM_perc = SOM
+         ) 
+```
+
+### Exploratory data analysis  
+```{r}
+glimpse(data4)
+summary(data4)
+```
+
+```{r}
+data4 %>% 
+  group_by(Site) %>% 
+  summarise(n())
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(N_fert))+
+  geom_histogram()
+```
+
+```{r}
+data4 %>% 
+  pivot_longer(cols = GY_mgha:SOM) %>% 
+  ggplot(aes(x = value))+
+  geom_histogram()+
+  facet_wrap(~name, scales = 'free')
+```
+
+
+
+
+```{r}
+data4 %>%
+  pivot_longer(cols = -c(ID, Site)) %>% 
+  ggplot(aes(value))+
+  geom_histogram()+
+  facet_wrap(~name, scales = 'free')+
+  theme(aspect.ratio = 1)
+```
+
+```{r}
+unique(data4$Site)
+class(data4$Site)
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(factor(Site), GY_mgha))+
+  geom_violin()
+```
+
+
+```{r}
+data4 %>% 
+  ggplot(aes(factor(Site), SOM))+
+  geom_boxplot()
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(x = N_fert, y = GY_mgha))+
+  geom_point(aes(color  = factor(Site)))+
+  geom_smooth(method = 'lm')
+```
+
+
+```{r}
+data4 %>% 
+  ggplot(aes(factor(Site), GY_mgha))+
+  geom_boxplot()
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(N_fert, GY_mgha))+
+  geom_point()+
+  geom_smooth(method = "lm")
+```
+
+
+### Analysis  
+```{r}
+# first try 
+m1 <- lm(GY_mgha ~ Site, data = data4)
+summary(m1)
+```
+
+
+```{r}
+m2 <- lm(GY_mgha ~ 1 + factor(Site), data = data4)
+m2 <- lm(GY_mgha ~ factor(Site), data = data4)
+summary(m2)
+```
+
+```{r}
+m3 <- lm(GY_mgha ~ 0 + factor(Site), data = data4) 
+m3 <- lm(GY_mgha ~ factor(Site) -1, data = data4) summary(m3)
+```
+
+
+```{r}
+# anova
+car::Anova(m3)
+```
+
+
+```{r}
+plot(m3)
+car::leveneTest(GY_mgha ~ 0 + factor(Site), data = data4)
+```
+
+```{r}
+m4 <- lm(GY_mgha ~ 0+ N_fert, data = data4) 
+
+summary(m4)
+```
+
+```{r}
+m5 <- lm(GY_mgha ~  N_fert, data = data4) 
+summary(m5)
+```
+
+```{r}
+data4 %>% 
+  ggplot(aes(N_fert, GY_mgha))+
+  geom_point()+
+  stat_function(fun = function(x){
+    coef(m4)[1]*x
+  })+
+  stat_function(fun = function(x){ 
+    coef(m5)[1] + coef(m5)[2]*x},
+    linetype =2)+
+  coord_cartesian(xlim = c(0, 210), ylim =c(0, 11))
+```
+
+
+Akaike: smaller numbers indicate a better model
+```{r}
+AIC(m4)
+AIC(m5)
+```
+
+
+```{r}
+m6 <- lm(GY_mgha ~  N_fert + factor(Site)-1, data = data4) 
+
+summary(m6)
+car::Anova(m6)
+```
+
+```{r}
+# wiqid
+AICtable(AICc(m4, m5, m6))
+```
+
