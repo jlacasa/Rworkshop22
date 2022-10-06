@@ -4,14 +4,16 @@ format: html
 editor: visual
 ---
 
-### Libraries  
+### Libraries
+
 ```{r}
 library(tidyverse)
 library(readxl)
 library(wiqid)
 ```
 
-### Data  
+### Data
+
 ```{r, warning=FALSE}
 data4 <- read.csv("../data/day4_data.csv") %>% 
   rename(Site = TRT#,
@@ -20,7 +22,8 @@ data4 <- read.csv("../data/day4_data.csv") %>%
          ) 
 ```
 
-### Exploratory data analysis  
+### Exploratory data analysis
+
 ```{r}
 glimpse(data4)
 summary(data4)
@@ -64,8 +67,8 @@ data4 %>%
   geom_smooth(method = "lm")
 ```
 
+### Analysis
 
-### Analysis  
 ```{r}
 m1 <- lm(GY_mgha ~ Site, data = data4)
 ```
@@ -105,4 +108,3 @@ summary(m6)
 ```{r}
 AICtable(AICc(m4, m5, m6))
 ```
-

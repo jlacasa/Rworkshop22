@@ -1,0 +1,71 @@
+---
+title: "Day5_Geo"
+format: html
+editor: visual
+---
+
+Temas
+
+-   GIS and definicion
+
+-   Modelos de datos y tipos de GIS
+
+    -    Vectorial
+
+    -    Raster
+
+-   SRC:
+
+    -    Definicion y usos
+
+    -   Importance
+
+    -   
+
+-   Example Create a variable rate prescription using R (PrecisionAg)
+
+```{r}
+
+```
+
+Resources
+
+-   Telegram:
+
+References
+
+-   <https://epsg.org/search/map>
+
+-   https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/
+
+-   https://mgimond.github.io/Spatial/index.html
+
+-   https://rspatial.org/raster/index.html
+
+-   https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/
+
+-   https://erinbecker.github.io/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html
+
+-   https://mgimond.github.io/Spatial/chp11_0.html
+
+-   https://castlab.org/tutorial/2019-04-10-spatial-data-in-r/
+
+-   https://www.emilyburchfield.org/courses/gsa/5_spatial_intro_lab.html
+
+-   https://colab.research.google.com/drive/16roxWflWy89RXFMu1QzkoC2wABomspHa?usp=sharing#scrollTo=R_cUMMSfPW5p
+
+-   https://geocompr.robinlovelace.net/adv-map.html
+
+-   http://132.72.155.230:3838/r/
+
+-   https://cengel.github.io/R-spatial/mapping.html#plotting-simple-features-sf-with-plot
+
+-   https://geobgu.xyz/presentations/p_2021_cbs/main.html
+
+Books
+
+-   https://link.springer.com/book/10.1007/978-1-4614-7618-4
+
+-   http://gis.humboldt.edu/OLM/r/Spatial%20Analysis%20With%20R.pdf
+
+-   https://jakubnowosad.com/BioGIS_19/workshop/#12
