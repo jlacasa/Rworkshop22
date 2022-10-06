@@ -8,7 +8,7 @@ editor: visual
 
 # Topics
 
--   Geographic Information System's (GIS)
+-   What is Geographic Information System's (GIS)
 
 -   Spatial Data types
 
@@ -36,11 +36,9 @@ editor: visual
 
     -   Corn_density_trial : 3857
 
-## What is a Geographic Information System's (GIS)?
+## What is Geographic Information System's (GIS)?
 
-## Spatial Data types
-
-### 
+### Spatial Data types
 
 ### What is a vector layer?
 
@@ -69,7 +67,7 @@ Commonly used vector layer file formats include binary formats (such as the **Sh
 |                   | Keyhole Markup Language (KML) | `.kml`                              |
 | Spatial Databases | PostGIS / PostgreSQL          |                                     |
 
-The `sf` package, is a newer (2016-) package for working with vector layers in R, which we are going to use in this book. In recent years, `sf` has become the standard package for working with vector data in R, practically replacing `sp`, `rgdal`, and `rgeos`. Pebesma, 2018, The R Journal (<https://journal.r-project.org/archive/2018-1/>)
+In **R**, The `sf` package, is a newer (2016-) package for working with vector layers in R, which we are going to use in this book. In recent years, `sf` has become the standard package for working with vector data in R, practically replacing `sp`, `rgdal`, and `rgeos`. Pebesma, 2018, The R Journal (<https://journal.r-project.org/archive/2018-1/>)
 
 More details in the sf documentation: <https://r-spatial.github.io/sf/articles/sf1.html>
 
@@ -85,6 +83,7 @@ Steps
 
 # Libraries
 library(dplyr)
+library(tidyr)
 library(sf)
 library(albersusa)
 library(ggplot2)
@@ -206,7 +205,8 @@ st_crs(seeding_rate_trial)
 ```{r}
 zones <- zones %>%
   st_set_crs(st_crs("epsg:3857")) %>%
-  st_transform(crs=32614) 
+  st_transform(crs=32614) %>%
+  mutate(Zone = factor(Zone, levels=c("Low", "Medium", "High"))) 
 
 seeding_rate_trial <- seeding_rate_trial %>%
   st_set_crs(st_crs("epsg:3857")) %>%
@@ -229,8 +229,7 @@ mapview(zones, zcol = "Zone",
 1.  Use intersect function to add the Management zone to the corn_seeding_rate_trial
 
 ```{r}
-corn_sr_zones <-st_join(seeding_rate_trial,zones) %>%
-  mutate(Zone = factor(Zone, levels=c("Low", "Medium", "High")))
+corn_sr_zones <-st_join(seeding_rate_trial,zones)
 
 mapview(corn_sr_zones, zcol = "Zone",
         col.regions = rdylgn, 
@@ -267,22 +266,63 @@ corn_sr_zones %>%
 1.  Obtain regressions for every management zone.
 
 ```{r}
-corn_sr_zones %>% 
+coef_zones <- corn_sr_zones %>% 
   group_by(Zone) %>%
   nest() %>% 
   mutate(model = data %>% 
            purrr::map(.f = ~lm(Yield ~ Plants_ha + I(Plants_ha^2), data = ..1))) %>% 
   mutate(b0 = model %>% purrr::map_dbl(~coef(.)[1]),
          b1 = model %>% purrr::map_dbl(~coef(.)[2]),
-         b2 = model %>% purrr::map_dbl(~coef(.)[3]))
+         b2 = model %>% purrr::map_dbl(~coef(.)[3])) %>%
+  as.data.frame() %>%
+  dplyr::select(Zone,b0,b1,b2)
+coef_zones
 ```
 
-1.  Calculate the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag.
+1.  Calculate the Agronomical Optimal Seeding rate and the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag and 340 USD/Mg (0.34usd/kg).
+
+$$
+AOSR=\frac{-\beta1}{2*\beta2}
+$$
+
+$$
+EOSR=\frac{Price.ratio-\beta1}{2*\beta2}
+$$
+
+$$
+Price.ratio=\frac{\frac{Price.seeds.bag}{n°.seeds.bag}}{Price.corn.nov}
+$$
+
+Each bag has 80000 seeds
+
+```{r}
+
+price_seeds_bag <- 320
+price_corn_at_harvest <- 0.31
+
+eosr_corn_zone <- coef_zones %>%
+  mutate(AOSR=- b1/(2*b2),
+         EOSR = (((price_seeds_bag/80000)/price_corn_at_harvest) - b1)/(2*b2)) 
+
+eosr_corn_zone
+```
 
 2.  Create a variable rate prescription for corn density
 
 ```{r}
-left_join()
+vrt_prescription <- left_join(zones, eosr_corn_zone,by = "Zone")
+class(vrt_prescription)
+
+```
+
+```{r}
+vrt_prescription
+```
+
+```{r}
+mapview(vrt_prescription, zcol = "EOSR", 
+        legend = TRUE, col.regions = rdylgn, 
+        map.types = c("Esri.WorldImagery"))
 ```
 
 Resources
