@@ -14,21 +14,13 @@ editor: visual
 
     -   Vectorial
 
-        -   
-
     -   Raster
 
 -   Coordinate Reference Systems (CRS):
 
-    -   Definicion y usos
+    -   Definition and uses.
 
     -   Importance
-
-    -   
-
--   Vectorial data type
-
-    -   
 
 -   Example Create a variable rate prescription using R (PrecisionAg)
 
@@ -37,6 +29,8 @@ editor: visual
     -   Corn_density_trial : 3857
 
 ## What is Geographic Information System's (GIS)?
+
+Technically, a GIS can be defined as a management technology of geographic information formed by electronic equipment (hardware) properly programmed (software) that allow manage a series of spatial data (geographical information) and carry out complex analyzes with these following the criteria imposed by the scientific team (staff).
 
 ### Spatial Data types
 
@@ -173,7 +167,7 @@ ggplot() +
 
 Steps
 
-1.  Load the management zones files and the corn density trial.
+-   Load the management zones files and the corn density trial.
 
 ```{r}
 
@@ -192,7 +186,7 @@ seeding_rate_trial
 class(seeding_rate_trial)
 ```
 
-1.  Check the coordinate reference systems of both files. Change it if is necessary.
+-   Check the coordinate reference systems of both files. Change it if is necessary.
 
 ```{r}
 st_crs(zones)
@@ -206,14 +200,17 @@ st_crs(seeding_rate_trial)
 zones <- zones %>%
   st_set_crs(st_crs("epsg:3857")) %>%
   st_transform(crs=32614) %>%
-  mutate(Zone = factor(Zone, levels=c("Low", "Medium", "High"))) 
+  mutate(Zone = factor(Zone, levels=c("Low", "Medium", "High")),
+         area_ha = units::set_units(st_area(zones),ha))
+
+
 
 seeding_rate_trial <- seeding_rate_trial %>%
   st_set_crs(st_crs("epsg:3857")) %>%
   st_transform(crs=32614)
 ```
 
-1.  Visualize interactively with Mapview the management zones polygons and the corn_seeding_rate_trial
+-   Visualize interactively with Mapview the management zones polygons and the corn_seeding_rate_trial
 
 ```{r}
 palette<-c("#c32f27","#ffdc00",'#007f5f')
@@ -226,7 +223,7 @@ mapview(zones, zcol = "Zone",
   mapview(seeding_rate_trial, zcol = "Plants_ha")
 ```
 
-1.  Use intersect function to add the Management zone to the corn_seeding_rate_trial
+-   Use intersect function to add the Management zone to the corn_seeding_rate_trial
 
 ```{r}
 corn_sr_zones <-st_join(seeding_rate_trial,zones)
@@ -236,7 +233,7 @@ mapview(corn_sr_zones, zcol = "Zone",
         map.types = c("Esri.WorldImagery"))
 ```
 
-1.  Visualize the population response curves.
+-   Visualize the population response curves.
 
 ```{r}
 corn_sr_zones %>%
@@ -263,7 +260,7 @@ corn_sr_zones %>%
   facet_wrap(~Zone)
 ```
 
-1.  Obtain regressions for every management zone.
+-   Obtain regressions for every management zone.
 
 ```{r}
 coef_zones <- corn_sr_zones %>% 
@@ -274,26 +271,25 @@ coef_zones <- corn_sr_zones %>%
   mutate(b0 = model %>% purrr::map_dbl(~coef(.)[1]),
          b1 = model %>% purrr::map_dbl(~coef(.)[2]),
          b2 = model %>% purrr::map_dbl(~coef(.)[3])) %>%
-  as.data.frame() %>%
   dplyr::select(Zone,b0,b1,b2)
 coef_zones
 ```
 
-1.  Calculate the Agronomical Optimal Seeding rate and the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag and 340 USD/Mg (0.34usd/kg).
+-   Calculate the Agronomical Optimal Seeding rate and the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag and 340 USD/Mg (0.34usd/kg) that is the price at harvesting.
 
 $$
 AOSR=\frac{-\beta1}{2*\beta2}
 $$
 
 $$
-EOSR=\frac{Price.ratio-\beta1}{2*\beta2}
+EOSR=\frac{Price\;ratio-\beta1}{2*\beta2}
 $$
 
 $$
-Price.ratio=\frac{\frac{Price.seeds.bag}{n°.seeds.bag}}{Price.corn.nov}
+Price.ratio=\frac{\frac{Price\;seeds\;bag}{n°\;seeds\;bag}}{Price\;corn\;at\;harvest}
 $$
 
-Each bag has 80000 seeds
+-   Each bag has 80000 seeds
 
 ```{r}
 
@@ -307,10 +303,10 @@ eosr_corn_zone <- coef_zones %>%
 eosr_corn_zone
 ```
 
-2.  Create a variable rate prescription for corn density
+-   Create a variable rate prescription for corn density
 
 ```{r}
-vrt_prescription <- left_join(zones, eosr_corn_zone,by = "Zone")
+vrt_prescription <- left_join(zones, eosr_corn_zone,by = "Zone") 
 class(vrt_prescription)
 
 ```
@@ -319,13 +315,30 @@ class(vrt_prescription)
 vrt_prescription
 ```
 
+-   Variable Seeding Rate prescription ready to load in the planter.
+
 ```{r}
 mapview(vrt_prescription, zcol = "EOSR", 
         legend = TRUE, col.regions = rdylgn, 
         map.types = c("Esri.WorldImagery"))
 ```
 
-Resources
+![](images/seeding_rate.jpg)
+
+#### Activity 3: Economic benefit per zone
+
+Using mutate and the approach you want, obtain the economic return per management zone. you should create a column with the yield at EOSR per zone and with this and the price per seed and corn price obtain the value using the next equation
+
+$$
+Economic\;revenue = (Price\;Corn*Yield\;at\;EOSR) - (Price\;per\;seed*EOSR) 
+$$
+
+```{r}
+
+
+```
+
+**Resources**
 
 -   Telegram in spanish: RSpatial_ES
 
