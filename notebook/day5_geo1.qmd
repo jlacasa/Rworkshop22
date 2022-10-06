@@ -4,59 +4,310 @@ format: html
 editor: visual
 ---
 
-Temas
+![](images/banner2.png)
 
--   GIS and definicion
+# Topics
 
--   Modelos de datos y tipos de GIS
+-   Geographic Information System's (GIS)
 
-    -    Vectorial
+-   Spatial Data types
 
-    -    Raster
+    -   Vectorial
 
--   SRC:
+        -   
 
-    -    Definicion y usos
+    -   Raster
+
+-   Coordinate Reference Systems (CRS):
+
+    -   Definicion y usos
 
     -   Importance
 
     -   
 
+-   Vectorial data type
+
+    -   
+
 -   Example Create a variable rate prescription using R (PrecisionAg)
+
+    -   Management_zones: 3857
+
+    -   Corn_density_trial : 3857
+
+## What is a Geographic Information System's (GIS)?
+
+## Spatial Data types
+
+### 
+
+### What is a vector layer?
+
+Vector layers are essentially sets of geometries associated with non-spatial attributes. The geometries are sequences of one or more point coordinates, possibly connected to form lines or polygons. The non-spatial attributes come in the form of a table.
+
+![](images/Attribute_Table.png){width="525"}
+
+### Then, the vector layers...
+
+-   Describe geographic features, using vectors defined by pairs of coordinates relative to some cartographic system (CRS).
+
+-   A pair of coordinates and their altitude manage a point.
+
+-   With two points we can generate a line.
+
+-   Also, through a grouping of lines they form polygons.
+
+Commonly used vector layer file formats include binary formats (such as the **Shapefile**) and plain text formats (such as **GeoJSON**). Vector layers are also frequently kept in a spatial database, such as **PostgreSQL/PostGIS**.
+
+| **Type**          | **Format**                    | **File extension**                  |
+|------------------|-------------------------|-----------------------------|
+| Binary            | ESRI Shapefile                | `.shp`, `.shx`, `.dbf`, `.prj`, ... |
+|                   | GeoPackage (GPKG)             | `.gpkg`                             |
+| Plain Text        | GeoJSON                       | `.json` or `.geojson`               |
+|                   | GPS Exchange Format (GPX)     | `.gpx`                              |
+|                   | Keyhole Markup Language (KML) | `.kml`                              |
+| Spatial Databases | PostGIS / PostgreSQL          |                                     |
+
+The `sf` package, is a newer (2016-) package for working with vector layers in R, which we are going to use in this book. In recent years, `sf` has become the standard package for working with vector data in R, practically replacing `sp`, `rgdal`, and `rgeos`. Pebesma, 2018, The R Journal (<https://journal.r-project.org/archive/2018-1/>)
+
+More details in the sf documentation: <https://r-spatial.github.io/sf/articles/sf1.html>
+
+### What is a raster layer?
+
+## Activities
+
+#### Activity 1: Create a plot of Kansas in where we can see the locations of Mesonet Stations
+
+Steps
+
+```{r}
+
+# Libraries
+library(dplyr)
+library(sf)
+library(albersusa)
+library(ggplot2)
+library(mapview)
+```
+
+1.  Load the county file and filter only Kansas.
+
+```{r}
+
+counties_usa <- counties_sf()
+counties_usa %>% data.frame()
+
+class(counties_usa)
+
+colnames(counties_usa)
+
+unique(counties_usa$state)
+```
+
+```{r}
+kansas_counties <-  counties_usa %>% filter(state == 'Kansas')
+```
+
+```{r}
+ggplot() + 
+  geom_sf(data = kansas_counties)
+```
+
+-   Load the entire USA states file
+
+```{r}
+usa_states <- usa_sf()
+```
+
+Briefly visualization to check that everything is ok.
+
+```{r}
+ggplot() +
+  geom_sf(data = usa_states) +
+     coord_sf(crs = st_crs(2163), 
+              xlim = c(-2500000, 2500000), 
+              ylim = c(-2300000, 730000))
+```
+
+```{r}
+ggplot(data = usa_states) +
+    geom_sf() +
+    geom_sf(data = kansas_counties, aes(fill=as.factor(name)),
+            show.legend = FALSE) +
+    scale_fill_viridis_d() +
+    coord_sf(crs = st_crs(4326), 
+             xlim = c(-104, -93), ylim = c(36, 41.5))
+```
+
+-   Load the mesonet weather stations locations files
+
+```{r}
+mesonet_sites <- read.csv('../data/Geo_Class1/KSMeso-Station-Metadata.csv',skip = 2)
+mesonet_sites
+```
+
+```{r}
+mesonet_sites <- mesonet_sites %>% 
+  st_as_sf(coords = c("Longitude","Latitude")) %>%
+  st_set_crs(st_crs("epsg:4326"))
+
+plot(mesonet_sites)
+```
+
+1.  Use ggplot2 to plot and visualize the information. Add the name of axis X and Y, Title and subtitle
+
+```{r}
+ggplot() +
+    geom_sf(data = usa_states,color='gray',fill='#343a40',size=0.4) +
+    geom_sf(data = kansas_counties, aes(fill=as.factor(name)),
+            show.legend = FALSE,size=0.2,color='black') + 
+    geom_sf(data = mesonet_sites,size=3, color='red',
+            fill='black')+ 
+    scale_fill_viridis_d() +
+    coord_sf(crs = st_crs(4326), 
+             xlim = c(-104, -93), ylim = c(36, 41)) 
+```
+
+#### **Activity 2**: Create a VRT prescription to change the seeding rate in corn crop.
+
+Steps
+
+1.  Load the management zones files and the corn density trial.
+
+```{r}
+
+zones <- read_sf('../data/Geo_Class1/management_zones.shp')
+
+seeding_rate_trial <- read_sf('../data/Geo_Class1/corn_density_trial.shp')
+```
+
+```{r}
+zones
+
+class(zones)
+
+seeding_rate_trial
+
+class(seeding_rate_trial)
+```
+
+1.  Check the coordinate reference systems of both files. Change it if is necessary.
+
+```{r}
+st_crs(zones)
+```
+
+```{r}
+st_crs(seeding_rate_trial)
+```
+
+```{r}
+zones <- zones %>%
+  st_set_crs(st_crs("epsg:3857")) %>%
+  st_transform(crs=32614) 
+
+seeding_rate_trial <- seeding_rate_trial %>%
+  st_set_crs(st_crs("epsg:3857")) %>%
+  st_transform(crs=32614)
+```
+
+1.  Visualize interactively with Mapview the management zones polygons and the corn_seeding_rate_trial
+
+```{r}
+palette<-c("#c32f27","#ffdc00",'#007f5f')
+rdylgn<-colorRampPalette(palette)
+
+
+mapview(zones, zcol = "Zone", 
+        legend = TRUE, col.regions = rdylgn, 
+        map.types = c("Esri.WorldImagery")) + 
+  mapview(seeding_rate_trial, zcol = "Plants_ha")
+```
+
+1.  Use intersect function to add the Management zone to the corn_seeding_rate_trial
+
+```{r}
+corn_sr_zones <-st_join(seeding_rate_trial,zones) %>%
+  mutate(Zone = factor(Zone, levels=c("Low", "Medium", "High")))
+
+mapview(corn_sr_zones, zcol = "Zone",
+        col.regions = rdylgn, 
+        map.types = c("Esri.WorldImagery"))
+```
+
+1.  Visualize the population response curves.
+
+```{r}
+corn_sr_zones %>%
+  ggplot() +
+  geom_point(aes(x=Plants_ha,y=Yield,color=Zone)) + 
+  geom_smooth(aes(x=Plants_ha,y=Yield),
+              method = "lm", formula = y ~ x + I(x^2)) + 
+  scale_color_manual(values=palette) +
+  xlab('Plant density (pl/ha)') + ylab('Corn yield (kg/ha)') + 
+  labs(title = 'Corn yield response to plant density',
+       subtitle = 'Response to field level')
+```
+
+```{r fig.width=8}
+corn_sr_zones %>%
+  ggplot() +
+  geom_point(aes(x=Plants_ha,y=Yield,color=Zone)) + 
+  geom_smooth(aes(x=Plants_ha,y=Yield),
+              method = "lm", formula = y ~ x + I(x^2)) + 
+  scale_color_manual(values=palette) +
+  xlab('Plant density (pl/ha)') + ylab('Corn yield (kg/ha)') + 
+  labs(title = 'Corn yield response to plant density',
+       subtitle = 'Response to field level') +
+  facet_wrap(~Zone)
+```
+
+1.  Obtain regressions for every management zone.
 
 ```{r}
 
 ```
 
+1.  Calculate the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag.
+
+1.  Create a variable rate prescription for corn density
+
+```{r}
+left_join()
+```
+
 Resources
 
--   Telegram:
+-   Telegram in spanish: RSpatial_ES
 
 References
 
 -   <https://epsg.org/search/map>
 
--   https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/
+-   [https://data.eol.ucar.edu/dataset/485.017 (MESONET)](https://data.eol.ucar.edu/dataset/485.017%20(MESONET))
 
--   https://mgimond.github.io/Spatial/index.html
+-   <https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/>
 
--   https://rspatial.org/raster/index.html
+-   <https://mgimond.github.io/Spatial/index.html>
 
--   https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/
+-   <https://rspatial.org/raster/index.html>
 
--   https://erinbecker.github.io/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html
+-   <https://datacarpentry.org/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/>
 
--   https://mgimond.github.io/Spatial/chp11_0.html
+-   <https://erinbecker.github.io/r-raster-vector-geospatial/09-vector-when-data-dont-line-up-crs/index.html>
 
--   https://castlab.org/tutorial/2019-04-10-spatial-data-in-r/
+-   <https://mgimond.github.io/Spatial/chp11_0.html>
 
--   https://www.emilyburchfield.org/courses/gsa/5_spatial_intro_lab.html
+-   <https://castlab.org/tutorial/2019-04-10-spatial-data-in-r/>
 
--   https://colab.research.google.com/drive/16roxWflWy89RXFMu1QzkoC2wABomspHa?usp=sharing#scrollTo=R_cUMMSfPW5p
+-   <https://www.emilyburchfield.org/courses/gsa/5_spatial_intro_lab.html>
 
--   https://geocompr.robinlovelace.net/adv-map.html
+-   <https://colab.research.google.com/drive/16roxWflWy89RXFMu1QzkoC2wABomspHa?usp=sharing#scrollTo=R_cUMMSfPW5p>
 
--   http://132.72.155.230:3838/r/
+-   <https://geocompr.robinlovelace.net/adv-map.html>
+
+-   <http://132.72.155.230:3838/r/>
 
 -   https://cengel.github.io/R-spatial/mapping.html#plotting-simple-features-sf-with-plot
 
