@@ -89,6 +89,7 @@ library(sf)
 library(albersusa)
 library(ggplot2)
 library(mapview)
+library(tidyverse)
 ```
 
 1.  Load the county file and filter only Kansas.
@@ -266,12 +267,19 @@ corn_sr_zones %>%
 1.  Obtain regressions for every management zone.
 
 ```{r}
-
+corn_sr_zones %>% 
+  group_by(Zone) %>%
+  nest() %>% 
+  mutate(model = data %>% 
+           purrr::map(.f = ~lm(Yield ~ Plants_ha + I(Plants_ha^2), data = ..1))) %>% 
+  mutate(b0 = model %>% purrr::map_dbl(~coef(.)[1]),
+         b1 = model %>% purrr::map_dbl(~coef(.)[2]),
+         b2 = model %>% purrr::map_dbl(~coef(.)[3]))
 ```
 
 1.  Calculate the Economical Optimal Seeding Rate (EOSR) based on a price ratio calculated with a seed bag price of 160 usd/bag.
 
-1.  Create a variable rate prescription for corn density
+2.  Create a variable rate prescription for corn density
 
 ```{r}
 left_join()
