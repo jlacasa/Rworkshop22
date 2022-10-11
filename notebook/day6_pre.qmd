@@ -1,0 +1,21 @@
+---
+title: "Day 6"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(car) # Anova
+library(broom) # model diagnostics
+library(emmeans) # Anova means
+library(multcomp) # pairwise comparisons
+library(multcompView) # needed for some tasks in multcomp 
+```
+
+
+
+```{r}
+
+```
+
