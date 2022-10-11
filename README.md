@@ -16,7 +16,7 @@ The objectives of this 2-3 month workshop are to introduce the R environment to 
 | 2 | 09/20/2022 | [tidyverse, ggplot](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day2_post.qmd) |
 | 3 | 09/27/2022 | [tidy data, review, workflow intro](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day3_post.qmd) |
 | 4 | 10/04/2022 | [Linear models I](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day4_post.qmd) |
-| 4 | 10/06/2022 | Geospatial topics I |
+| 4 | 10/06/2022 | [Geospatial topics I](https://github.com/jlacasa/Rworkshop22/blob/main/notebook/day5_geo1.qmd) |
 | 5 | 10/11/2022 | Linear models II |
 | 5 | 10/13/2022 | Geospatial topics II |
 | 6 | 10/18/2022 | Iteration: map functions, for loops. Functions. |
