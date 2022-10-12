@@ -1,0 +1,144 @@
+---
+title: "Day 6"
+format: html
+editor: visual
+---
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(car) # Anova
+library(broom) # model diagnostics
+library(emmeans) # Anova means
+library(multcomp) # pairwise comparisons
+library(multcompView) # needed for some tasks in multcomp 
+```
+
+```{r}
+data4 <- read.csv("../data/day4_data.csv") %>% 
+  rename(Site = TRT,
+         N_kgha = N_fert,
+         SOM_perc = SOM) %>% 
+  mutate(Site = as.factor(Site))
+```
+
+```{r}
+m3 <- lm(GY_mgha ~ Site -1, data = data4) 
+summary(m3)
+car::Anova(m3)
+```
+
+**!!** What is the difference between `Anova()` and `anova()`?  
+```{r anova differences}
+anova(m3) # default in R
+Anova(m3) # car package
+```
+
+
+```{r}
+m6 <- lm(GY_mgha ~  N_kgha + factor(Site)-1, data = data4) 
+m7 <- lm(GY_mgha ~  factor(Site) + N_kgha -1, data = data4) 
+anova(m6)
+anova(m7)
+```
+
+
+```{r}
+car::Anova(m6, type = "III")
+```
+
+```{r}
+m8 <- lm(GY_mgha ~  factor(Site)*N_kgha -1, data = data4) 
+car::Anova(m8, type = "III")
+```
+
+### Means comparisons  
+
+```{r}
+m3_means <- emmeans(m3, specs = ~ Site) %>% 
+  as.data.frame()
+car::Anova(m3)
+```
+
+
+```{r}
+comparisons <- glht(m3,
+                    linfct = mcp(Site = "Tukey"),
+                    alternative = "two.sided")
+
+m3_cld <- cld(comparisons,
+              adjust = "Tukey",
+              Letters = letters,
+              reversed = TRUE,
+              comparisons = TRUE)
+
+m3_cld_df <- data.frame(Site = 1:5,
+                        letter = m3_cld$mcletters$Letters)
+
+m3_cld_df
+
+m3_means$group <- m3_cld_df$letter
+```
+
+```{r}
+m3_means %>% 
+  ggplot(aes(x= emmean, y = Site))+
+  geom_errorbarh(aes(xmin = lower.CL, xmax = upper.CL),
+                 height = 0 )+
+  geom_point(color = 'tomato')+
+  geom_text(aes(label = group), nudge_y = 0.2, nudge_x = 0)+
+  labs(x = expression(Grain~Yield~(tn~ha^{-1})))+
+  theme_bw()+
+  coord_flip()
+
+```
+
+
+```{r }
+m3_means %>%
+  ggplot(aes(emmean, Site))+
+  geom_errorbarh(aes(xmin = lower.CL, xmax = upper.CL), 
+                 color = "grey70", height = .2)+
+  geom_point()+
+  geom_text(aes(label = group, x = emmean ), nudge_y = 0.2)+
+  labs(x = expression(Mean~Yield~(tn~ha^{-1})))+
+  ggpubr::theme_pubclean()
+```
+
+## Practice  
+
+```{r}
+url <- "https://raw.githubusercontent.com/jlacasa/CiampittiLab-Rworkshop/main/data/lotus.csv"
+df <- read.csv(url)
+```
+
+## EDA  
+1. What variables are there?  
+2. Reduce "tallo_1", "tallo_2", ..., "tallo_5" to one column "tallo", one column "rep" and another with the value (cm).
+
+3. Compare species for all traits  
+```{r}
+# 1
+colnames(df)
+df$planta %>% unique()
+
+df <- df %>% 
+  # mutate(planta = str_replace(planta , "Tr\xe9bol", "Trebol")) %>% 
+  mutate(planta = case_when(planta == "Tr\xe9bol frutilla" ~ "Trebol frutilla",
+                            planta == "Tr\xe9bol blanco" ~ "Trebol blanco",
+                            planta == "Tr\xe9bol balansa" ~ "Trebol balansa",
+                            TRUE ~ planta))
+
+colnames(df)
+
+# 2 
+# hint
+df %>%
+  pivot_longer(cols = tallo_1:tallo_5) %>% 
+  separate(name, c(NA, "rep")) %>% 
+  group_by(planta,trat, doy) %>% 
+  mutate(tallo_cm = mean(value, na.rm = T)) %>% 
+  drop_na(tallo_cm) %>% 
+  dplyr::select(-c(rep, value)) %>% 
+  unique()
+```
+
