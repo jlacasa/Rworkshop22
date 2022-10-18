@@ -1,7 +1,159 @@
 ---
-title: "Iterations"
+title: "Avoiding code duplication - iterations"
 format: html
 editor: visual
 ---
+```{r}
+library(tidyverse)
+```
 
-#
+# Iterating  
+
+### What are iterations?  
+
+Reducing code duplication has three main benefits:
+
+It’s easier to see the intent of your code, because your eyes are drawn to what’s different, not what stays the same.
+
+It’s easier to respond to changes in requirements. As your needs change, you only need to make changes in one place, rather than remembering to change every place that you copied-and-pasted the code.
+
+You’re likely to have fewer bugs because each line of code is used in more places.
+
+## For loops  
+
+```{r}
+years <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", 10:22)
+for (i in years) {
+  data.frame(day = 1:31, month = "January",
+             temp_min = rnorm(31, -12, 3),
+             temp_max = rnorm(31, -2, 3)) %>%
+    write.csv(paste0("../data/weather/temp_20", i ,".csv"), row.names = FALSE)
+}
+```
+
+
+```{r}
+weather_comp <- read.csv("../data/weather/temp_2001.csv") %>%
+  bind_rows(read.csv("../data/weather/temp_2002.csv") )
+```
+
+```{r}
+# 1. store
+df <- data.frame()
+years <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", 10:22)
+
+# sequence
+for (i in 1:length(years)) {
+  df <- df %>% 
+    bind_rows(
+      read.csv(paste0("../data/pp_", years[i] , ".csv"))
+    )
+}
+```
+
+### Example 2  
+```{r}
+url <- "https://raw.githubusercontent.com/jlacasa/CiampittiLab-Rworkshop/main/data/lotus.csv"
+df_lotus <- read.csv(url)
+
+df_lotus <- df_lotus %>% 
+  mutate(planta = str_replace(planta , "Tr\xe9bol", "Trebol")) %>% 
+  pivot_longer(cols = tallo_1:tallo_5) %>% 
+  group_by(planta, trat, doy) %>% 
+  mutate(tallo_cm = mean(value, na.rm= T)) %>% 
+  dplyr::select(-c(name, value)) %>% 
+  unique() %>% 
+  ungroup()
+```
+
+```{r}
+df_lotus %>% 
+  pivot_longer(cols = flores:tallo_cm) %>% 
+  ggplot(aes(doy, value))+
+  geom_point()+
+  facet_wrap(~name, scales = 'free')
+```
+
+```{r}
+df_lotus %>% 
+  ggplot(aes(doy, pac))+
+  geom_point(aes(color = trat))+
+  facet_wrap(~planta)
+```
+
+```{r}
+df_lotus_summary <- df_lotus %>%
+  group_by(planta, trat, doy) %>% 
+  summarise_all(.funs = c(mean, sd), na.rm = T)
+
+df_lotus_summary %>% 
+  ggplot(aes(doy, pac_fn1))+
+  geom_line(aes(group = trat, linetype = trat))+
+  geom_errorbar(aes(ymin = pac_fn1 - pac_fn2, ymax = pac_fn1 + pac_fn2), 
+                width = 2)+
+  geom_point()+
+  facet_wrap(~planta)+
+  labs(x = "Day of the year", 
+       y = "Aboveground biomass (g)",
+       linetype = "Treatment")
+```
+
+## Map functions  
+
+
+A repetitive task...  
+
+
+```{r}
+lm_greenleaves <- lm(hv ~ planta -1, data = df_lotus)
+lm_deadleaves <- lm(hm ~ planta -1, data = df_lotus)
+lm_w <- lm(pac ~ planta -1, data = df_lotus)
+lm_roots <- lm(rsum ~ planta -1, data = df_lotus)
+```
+
+```{r}
+df_lotus_long <- df_lotus %>% 
+  pivot_longer(cols = flores:tallo_cm)
+```
+
+```{r}
+lm_greenleaves <- lm(value ~ planta -1, 
+                     data = df_lotus %>%
+                       filter(name == "hv"))
+
+lm_deadleaves <- lm(value ~ planta -1,
+                    data = df_lotus %>%
+                      filter(name == "hm"))
+
+lm_w <- lm(value ~ planta -1, data = df_lotus %>%
+                       filter(name == "pac"))
+
+```
+
+```{r}
+df_lotus_long %>% 
+  group_by(name) %>%
+  nest() %>% 
+  mutate(model = data %>% map(~lm(value ~ planta -1, data = .)))
+```
+
+
+
+## Functions  
+
+```{r}
+print("Hi my name is Peter")
+print("Hi my name is Jessica")
+print("Hi my name is Sandra")
+print("Hi my name is Esteban")
+print("Hi my name is Stephen")
+print("Hi my name is John")
+print("Hi my name is Sarah")
+```
+
+### Give an output  
+
+```{r}
+
+```
+
