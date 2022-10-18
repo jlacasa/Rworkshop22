@@ -3,7 +3,7 @@ title: "Avoiding code duplication - iterations"
 format: html
 editor: visual
 ---
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 ```
 
